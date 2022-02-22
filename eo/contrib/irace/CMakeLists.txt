@@ -16,7 +16,7 @@ set(VERSION_MINOR 1 CACHE STRING "Minor version number" )
 set(VERSION_PATCH 0 CACHE STRING "Patch version number" )
 mark_as_advanced(VERSION_MAJOR VERSION_MINOR VERSION_PATCH)
 
-
+add_subdirectory(../../../extern/pybind11 ./pybind_build/)
 ######################################################################################
 # Configurable user settings
 ######################################################################################
@@ -44,16 +44,16 @@ link_directories(${PARADISEO_BUILD}/lib)
 set(PARADISEO_LIBRARIES ga eoutils eo)
 
 # IOH
-set(IOH_ROOT "~/code/IOHexperimenter/" CACHE PATH "Where to find IOHexperimenter")
+set(IOH_ROOT "/usr/local/" CACHE PATH "Where to find IOHexperimenter")
 find_path(IOH_HPP "ioh.hpp" PATHS ${IOH_ROOT}/include/)
 # find_library(IOH_LIBRARY "IOH" PATHS ${IOH_ROOT} PATH_SUFFIXES release Release debug Debug build Build)
 
 if(EXISTS ${IOH_HPP}) # AND EXISTS ${IOH_LIBRARY})
     message(STATUS "Found IOH in ${IOH_ROOT}")
     include_directories(${IOH_ROOT}/include/)
-    include_directories(${IOH_ROOT}/external/fmt/include/)
-    include_directories(${IOH_ROOT}/external/clutchlog/)
-    link_directories(${IOH_ROOT}/release/external/fmt/)
+    include_directories(${IOH_ROOT}/fmt/include/)
+    include_directories(${IOH_ROOT}/clutchlog/)
+    link_directories(${IOH_ROOT}/lib/)
 
 else()
     if(NOT EXISTS ${IOH_HPP})
@@ -68,11 +68,9 @@ endif()
 ######################################################################################
 # Start building
 ######################################################################################
+#add_executable(onlymutga onlymutga.cpp)
+#target_link_libraries(onlymutga ${PARADISEO_LIBRARIES} fmt)
 
-add_executable(fastga fastga.cpp)
+add_executable(fastga fastga_nevergrad.cpp)
 # Link to stdc++fs at the end because of an Ubuntu bug, see:  https://stackoverflow.com/a/57760267
-target_link_libraries(fastga ${PARADISEO_LIBRARIES} fmt stdc++fs)
-
-add_executable(onlymutga onlymutga.cpp)
-target_link_libraries(onlymutga ${PARADISEO_LIBRARIES} fmt)
-
+target_link_libraries(fastga ${PARADISEO_LIBRARIES} fmt pybind11::embed)
