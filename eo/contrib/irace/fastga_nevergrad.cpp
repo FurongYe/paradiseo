@@ -294,7 +294,7 @@ int main(int argc, char* argv[])
 
     /***** Problem parameters *****/
     auto problem_factory = prepare_problem();
-    auto problem =  problem_factory->create("onemax",  // create by name
+    auto problem =  problem_factory->create("pbo_onemax",  // create by name
                                   1,             // instance id
                                   5              // number of search variables
                                   );

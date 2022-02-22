@@ -12,17 +12,32 @@ double nevergrad_onemax(const std::vector<int> &x) {
     return p(py::cast(x)).cast<double>();
 }
 
+double nevergrad_leadingones(const std::vector<int> &x) { 
+    py::object p = py::module_::import("nevergrad.functions").attr("corefuncs").attr("DiscreteFunction")("leadingones",2);
+    return p(py::cast(x)).cast<double>();
+}
+
+double nevergrad_jump(const std::vector<int> &x) { 
+    py::object p = py::module_::import("nevergrad.functions").attr("corefuncs").attr("DiscreteFunction")("jump",2);
+    return p(py::cast(x)).cast<double>();
+}
+
+double nevergrad_pbo_onemax(const std::vector<int> &x) { 
+    py::object p = py::module_::import("nevergrad.functions.iohprofiler").attr("PBOFunction")(1,1,x.size());
+    return p(py::cast(x)).cast<double>();
+}
+
+
 /*****************************************************************************
  * IOH + Nevergrad problem adaptation.
  *****************************************************************************/
 
 auto prepare_problem() {
-    ioh::problem::wrap_function<int>(&nevergrad_onemax,  // the new function
-                                      "onemax", // name of the new function
-                                      ioh::common::OptimizationType::Maximization, // optimization type
-                                      0,  // lowerbound  
-                                      1  // upperbound
-                                    );
+    ioh::problem::wrap_function<int>(&nevergrad_onemax, "onemax", ioh::common::OptimizationType::Maximization, 0, 1);
+    ioh::problem::wrap_function<int>(&nevergrad_leadingones, "leadingones", ioh::common::OptimizationType::Maximization, 0, 1);
+    ioh::problem::wrap_function<int>(&nevergrad_jump, "jump", ioh::common::OptimizationType::Maximization, 0, 1);
+    ioh::problem::wrap_function<int>(&nevergrad_pbo_onemax, "pbo_onemax", ioh::common::OptimizationType::Maximization, 0, 1);
+
     auto &factory = ioh::problem::ProblemRegistry<ioh::problem::Integer>::instance();
     return &factory;
 }
